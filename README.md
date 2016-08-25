@@ -15,12 +15,17 @@ A API será baixada e colocada na pasta "vendor" e o arquivo autoload.php sejá 
 ##### Exemplos
 
 ```php
-// Capturando o captcha em formato base64 (png)
+// Iniciando a classe
+
+use DownloadNFeSefaz\DownloadNFeSefaz;
+
 $CNPJ = "12345678987654";
 $path_cert = "/pasta_do_certificado/";
 $senha_cert = "12345678";
 
 $downloadXml = new DownloadNFeSefaz($CNPJ, $path_cert, $senha_cert);
+
+// Capturando o captcha em formato base64 (png)
 $captcha = $downloadXml->getDownloadXmlCaptcha();
 
 // Exibindo em html

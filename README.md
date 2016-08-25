@@ -37,3 +37,10 @@ $chave_acesso = "12345678901234567890123456789012345678901234";
 $xml = $downloadXml->downloadXmlSefaz($captcha, $chave_acesso);
 
 echo $xml;
+```
+
+Qualquer dúvida pergunte [aqui](https://groups.google.com/forum/#!topic/nfephp/H7UdfhnbKXE).
+
+Edimário Gomes - Aconos Tecnologia: 
+edi.gomes00@gmail.com,
+edi.gomes@aconos.com.br

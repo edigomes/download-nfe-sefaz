@@ -8,7 +8,7 @@
 
 namespace DownloadNFeSefaz;
 
-use DownloadNFeSefaz\DownloadNFeSefaz;
+use DownloadNFeSefaz\DownloadNFeSefaz\DownloadNFeSefaz;
 
 /**
  * Description of Test
@@ -18,6 +18,6 @@ use DownloadNFeSefaz\DownloadNFeSefaz;
 class Test {
     public function run() {
         $downloadXml = new DownloadNFeSefaz("", "", "");
-        $captcha = $downloadXml->getDownloadXmlCaptcha();
+        //$captcha = $downloadXml->getDownloadXmlCaptcha();
     }
 }

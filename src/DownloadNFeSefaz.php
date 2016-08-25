@@ -16,7 +16,7 @@ class DownloadNFeSefaz {
     
     /**
      * CNPJ da empresa emitente 
-     * @var type String
+     * @var String
      */
     private $CNPJ;
     
@@ -39,8 +39,8 @@ class DownloadNFeSefaz {
 
     /**
      * Construct
-     * @param type $CNPJ
-     * @param type $pathCertsFiles
+     * @param String $CNPJ
+     * @param String $pathCertsFiles
      */
     public function __construct($CNPJ, $pathCertsFiles, $certPass) {
         // TODO: Validar CNPJ
@@ -55,6 +55,7 @@ class DownloadNFeSefaz {
      * Faz o download da NF-e no site da sefaz usando o certificado digital do cliente
      * @param type $txtCaptcha Captcha fornecedo por getDownloadXMLCaptcha
      * @param type $chNFe Chave de acesso da NF-e
+     * @return String XML da NF-e
      */
     public function downloadXmlSefaz($txtCaptcha, $chNFe) {
         
@@ -171,7 +172,8 @@ class DownloadNFeSefaz {
     
     /**
      * Retorna o captcha da sefaz para download do XML
-     * @return type
+     * no formato base64 (png)
+     * @return String base64 png
      */
     public function getDownloadXmlCaptcha() {
         

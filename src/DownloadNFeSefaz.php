@@ -12,7 +12,7 @@ namespace DownloadNFeSefaz;
  * @author Edimário Gomes <edi.gomes00@gmail.com>
  * @license GPL
  */
-class DownloadNFeSefaz {
+class DownloadXMLNFeSefaz {
     
     /**
      * CNPJ da empresa emitente 

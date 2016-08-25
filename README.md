@@ -19,8 +19,16 @@ A API será baixada e colocada na pasta "vendor" e o arquivo autoload.php sejá 
 
 use DownloadNFeSefaz\DownloadNFeSefaz;
 
+// CNPJ do certificado digital
 $CNPJ = '12345678987654';
+
+// Pasta onde se encontram os arquivos .pem
+// {CNPJ}_priKEY.pem
+// {CNPJ}_certKEY.pem
+// {CNPJ}_pubKEY.pem
 $path_cert = '/pasta_do_certificado/';
+
+// Senha do certificado
 $senha_cert = '12345678';
 
 $downloadXml = new DownloadNFeSefaz($CNPJ, $path_cert, $senha_cert);

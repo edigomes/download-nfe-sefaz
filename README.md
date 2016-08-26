@@ -24,7 +24,7 @@ require './vendor/autoload.php';
 
 use DownloadNFeSefaz\DownloadNFeSefaz;
 
-$downloadXml = new DownloadNFeSefaz($CNPJ, $path_cert, $senha_cert);
+$downloadXml = new DownloadNFeSefaz();
 
 // Capturando o captcha em formato base64 (png)
 $captcha = $downloadXml->getDownloadXmlCaptcha();

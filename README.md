@@ -17,7 +17,6 @@ A API será baixada e colocada na pasta "vendor" e o arquivo autoload.php sejá 
 ##### Requisitando o captcha (captcha.php)
 
 ```php
-
 // Autoload
 require './vendor/autoload.php';
 

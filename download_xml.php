@@ -1,11 +1,12 @@
 <?php
 
+// Autoload
 require './vendor/autoload.php';
 
-// Iniciando a classe
-
+// Namespace
 use DownloadNFeSefaz\DownloadNFeSefaz;
 
+// Iniciando a classe
 $downloadXml = new DownloadNFeSefaz();
 
 // CNPJ do certificado digital
@@ -15,7 +16,7 @@ $CNPJ = '12345678901234';
 // {CNPJ}_priKEY.pem
 // {CNPJ}_certKEY.pem
 // {CNPJ}_pubKEY.pem
-$path_cert = '\{pasta_do_certificado}\\';
+$path_cert = '\pasta_do_certificado\\';
 
 // Senha do certificado
 $senha_cert = '12345678';

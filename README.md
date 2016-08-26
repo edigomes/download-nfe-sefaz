@@ -14,26 +14,14 @@ A API será baixada e colocada na pasta "vendor" e o arquivo autoload.php sejá 
 
 ## Exemplos
 
-##### Requisitando o captcha
+##### Requisitando o captcha (captcha.php)
 
 ```php
 // Iniciando a classe
 
 use DownloadNFeSefaz\DownloadNFeSefaz;
 
-// CNPJ do certificado digital
-$CNPJ = '12345678987654';
-
-// Pasta onde se encontram os arquivos .pem
-// {CNPJ}_priKEY.pem
-// {CNPJ}_certKEY.pem
-// {CNPJ}_pubKEY.pem
-$path_cert = '/pasta_do_certificado/';
-
-// Senha do certificado
-$senha_cert = '12345678';
-
-$downloadXml = new DownloadNFeSefaz($CNPJ, $path_cert, $senha_cert);
+$downloadXml = new DownloadNFeSefaz();
 
 // Capturando o captcha em formato base64 (png)
 $captcha = $downloadXml->getDownloadXmlCaptcha();
@@ -45,7 +33,7 @@ echo "<img src=\"$captcha\">";
 
 Com o captcha em mãos vamos fazer o download do XML (quem sabe consseguimos quebrar esse captcha depois)
 
-##### Fazendo o download do XML
+##### Fazendo o download do XML (download_xml.php)
 
 ```php
 // Iniciando a classe
@@ -64,12 +52,12 @@ $path_cert = '/pasta_do_certificado/';
 // Senha do certificado
 $senha_cert = '12345678';
 
-$downloadXml = new DownloadNFeSefaz($CNPJ, $path_cert, $senha_cert);
+$downloadXml = new DownloadNFeSefaz();
 
 // Sabendo o captcha é só fazer o download do XML informando o mesmo e a chave de acesso da NF-e
 $captcha = '{captcha_da_imagem}';
 $chave_acesso = '{chave_de_acesso_com_44_digitos}';
-$xml = $downloadXml->downloadXmlSefaz($captcha, $chave_acesso);
+$xml = $downloadXml->downloadXmlSefaz($captcha, $chave_acesso, $CNPJ, $path_cert, $senha_cert);
 
 echo $xml;
 ```

@@ -36,20 +36,6 @@ class DownloadNFeSefaz {
      * @var type 
      */
     private $certPass;
-
-    /**
-     * Construct
-     * @param String $CNPJ
-     * @param String $pathCertsFiles
-     */
-    public function __construct($CNPJ, $pathCertsFiles, $certPass) {
-        // TODO: Validar CNPJ
-        $this->CNPJ = $CNPJ;
-        // TODO: Validar se existe a pasta e os arquivos .pem
-        $this->pathCertsFiles = $pathCertsFiles;
-        // TODO: Validar senha do certificado
-        $this->certPass = $certPass;
-    }
     
     /**
      * Faz o download da NF-e no site da sefaz usando o certificado digital do cliente
@@ -57,7 +43,14 @@ class DownloadNFeSefaz {
      * @param type $chNFe Chave de acesso da NF-e
      * @return String XML da NF-e
      */
-    public function downloadXmlSefaz($txtCaptcha, $chNFe) {
+    public function downloadXmlSefaz($txtCaptcha, $chNFe, $CNPJ, $pathCertsFiles, $certPass) {
+        
+        // TODO: Validar CNPJ
+        $this->CNPJ = $CNPJ;
+        // TODO: Validar se existe a pasta e os arquivos .pem
+        $this->pathCertsFiles = $pathCertsFiles;
+        // TODO: Validar senha do certificado
+        $this->certPass = $certPass;
         
         // TODO: validar chNFe 44 digitos
         
@@ -84,7 +77,7 @@ class DownloadNFeSefaz {
         curl_setopt($ch, CURLOPT_VERBOSE, 1);
         //curl_setopt($ch, CURLOPT_STDERR, $f);
         curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
-        
+
         // Collecting all POST fields
         $postfields = array();
         $postfields['__EVENTTARGET'] = "";
@@ -119,6 +112,13 @@ class DownloadNFeSefaz {
             // URL onde a sefaz fornece o download do xml
             $url_download = "http://www.nfe.fazenda.gov.br/portal/consultaCompleta.aspx?tipoConteudo=XbSeqxE8pl8";
 
+            // Verifica se o certificado existe na pasta
+            if (!file_exists($this->pathCertsFiles . $this->CNPJ .'_priKEY.pem') ||
+                !file_exists($this->pathCertsFiles . $this->CNPJ .'_priKEY.pem') ||
+                !file_exists($this->pathCertsFiles . $this->CNPJ .'_priKEY.pem')) {
+                throw new \Exception('Certificado digital não encontrado na pasta: ' . $this->pathCertsFiles . '!');
+            }
+            
             /**
             Download xml
             */

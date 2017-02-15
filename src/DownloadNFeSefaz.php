@@ -65,8 +65,8 @@ class DownloadNFeSefaz {
         $this->certPass = $certPass;
 
         // TODO: validar chNFe 44 digitos
-
-        session_start();
+        /*Verificando se a session já não foi aberta*/
+        if (session_status() == PHP_SESSION_NONE) session_start();
 
         ob_implicit_flush(false);
 
@@ -293,8 +293,8 @@ class DownloadNFeSefaz {
      * @return String base64 png
      */
     public function getDownloadXmlCaptcha() {
-
-        session_start();
+        /*Verificando se a session já não foi aberta*/
+        if (session_status() == PHP_SESSION_NONE) session_start();
 
         // Passo 1
         $url = "http://www.nfe.fazenda.gov.br/portal/consulta.aspx?tipoConsulta=completa&tipoConteudo=XbSeqxE8pl8=";

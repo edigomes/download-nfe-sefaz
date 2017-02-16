@@ -158,7 +158,7 @@ class DownloadNFeSefaz {
         if (isset($tagTeste[0])) {
             $tagDownload = $tagTeste[0];
         } else {
-            exit($html);
+            //exit($html);
             throw new Exception('Não foi possível fazer o download do XML, por favor atualize o captcha e tente novamente (sessão expirada)');
         }
 

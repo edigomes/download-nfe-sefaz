@@ -61,7 +61,7 @@ $path_cert = '\pasta_do_certificado\\';
 $senha_cert = '12345678';
 
 // Sabendo o captcha é só fazer o download do XML informando o mesmo e a chave de acesso da NF-e
-$captcha = '{captcha}';
+$captcha = 'digiteaquiocaptcha';
 
 // Chave de acesso
 $chave_acesso = '12345678901234567890123456789012345678901234';

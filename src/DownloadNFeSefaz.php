@@ -65,8 +65,8 @@ class DownloadNFeSefaz {
         $this->certPass = $certPass;
 
         // TODO: validar chNFe 44 digitos
-
-        session_start();
+        /*Verificando se a session já não foi aberta*/
+        if (session_status() == PHP_SESSION_NONE) session_start();
 
         ob_implicit_flush(false);
 
@@ -129,7 +129,7 @@ class DownloadNFeSefaz {
         curl_setopt($ch, CURLOPT_HEADER, FALSE);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, FALSE);
         curl_setopt($ch, CURLOPT_REFERER, $url);
-        curl_setopt($ch, CURLOPT_VERBOSE, FALSE);
+        curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 400);
         curl_setopt($ch, CURLOPT_TIMEOUT, 400); //timeout in seconds
         curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
@@ -142,7 +142,7 @@ class DownloadNFeSefaz {
         $document->loadHTML($html);
         
         preg_match('~Dados da NF-e~', $html, $tagTeste);
-        //exit($html);
+        exit($html);
         $viewstate = $document->getElementById('__VIEWSTATE')->getAttribute('value');
         $stategen = $document->getElementById('__VIEWSTATEGENERATOR')->getAttribute('value');
         $eventValidation = $document->getElementById('__EVENTVALIDATION')->getAttribute('value');
@@ -158,7 +158,7 @@ class DownloadNFeSefaz {
         if (isset($tagTeste[0])) {
             $tagDownload = $tagTeste[0];
         } else {
-            exit($html);
+            //exit($html);
             throw new Exception('Não foi possível fazer o download do XML, por favor atualize o captcha e tente novamente (sessão expirada)');
         }
 
@@ -220,10 +220,6 @@ class DownloadNFeSefaz {
 
             curl_setopt($ch_download, CURLOPT_POST, 1);
             curl_setopt($ch_download, CURLOPT_POSTFIELDS, $postfields_download);
-            
-            //$verbose = fopen('log.txt', 'w+');
-            //curl_setopt($ch_download, CURLOPT_STDERR, $verbose);
-            curl_setopt($ch_download, CURLOPT_VERBOSE, TRUE);
 
             $response = curl_exec($ch_download); // Get result after login page.
 
@@ -275,8 +271,8 @@ class DownloadNFeSefaz {
             // Cert pass
             curl_setopt($ch_download, CURLOPT_SSLCERTPASSWD, $this->certPass);
             
-            //$verbose = fopen('log.txt', 'w+');
-            //curl_setopt($ch_download, CURLOPT_STDERR, $verbose);
+            $verbose = fopen('log.txt', 'w+');
+            curl_setopt($ch_download, CURLOPT_STDERR, $verbose);
             curl_setopt($ch_download, CURLOPT_VERBOSE, TRUE);
 
             $response_xml = curl_exec($ch_download); // Get result after login page.
@@ -297,8 +293,8 @@ class DownloadNFeSefaz {
      * @return String base64 png
      */
     public function getDownloadXmlCaptcha() {
-
-        session_start();
+        /*Verificando se a session já não foi aberta*/
+        if (session_status() == PHP_SESSION_NONE) session_start();
 
         // Passo 1
         $url = "http://www.nfe.fazenda.gov.br/portal/consulta.aspx?tipoConsulta=completa&tipoConteudo=XbSeqxE8pl8=";

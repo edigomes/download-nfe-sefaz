@@ -142,7 +142,7 @@ class DownloadNFeSefaz {
         $document->loadHTML($html);
         
         preg_match('~Dados da NF-e~', $html, $tagTeste);
-        exit($html);
+        //exit($html);
         $viewstate = $document->getElementById('__VIEWSTATE')->getAttribute('value');
         $stategen = $document->getElementById('__VIEWSTATEGENERATOR')->getAttribute('value');
         $eventValidation = $document->getElementById('__EVENTVALIDATION')->getAttribute('value');

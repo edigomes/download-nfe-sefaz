@@ -43,7 +43,7 @@ class DownloadNFeSefaz {
     public function __construct() {
         error_reporting(E_ERROR | ~E_WARNING);
     }
-    
+
     /**
      * Faz o download da NF-e no site da sefaz usando o certificado digital do cliente
      * @param type $txtCaptcha Captcha fornecedo por getDownloadXMLCaptcha
@@ -52,10 +52,8 @@ class DownloadNFeSefaz {
      */
     public function downloadXmlSefaz($txtCaptcha, $chNFe, $CNPJ, $pathCertsFiles, $certPass) {
 
-        //ini_set('display_errors', 1);
-        //ini_set('display_startup_errors', 1);
-        
-
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
 
         // TODO: Validar CNPJ
         $this->CNPJ = $CNPJ;
@@ -65,32 +63,30 @@ class DownloadNFeSefaz {
         $this->certPass = $certPass;
 
         // TODO: validar chNFe 44 digitos
-        /*Verificando se a session já não foi aberta*/
-        if (session_status() == PHP_SESSION_NONE) session_start();
 
-        ob_implicit_flush(false);
+        /* Verificando se a session já não foi aberta */
+        if (session_status() == PHP_SESSION_NONE)
+            session_start();
 
         // URL onde a sefaz fornece o botão de download
-        $url = "http://www.nfe.fazenda.gov.br/portal/consulta.aspx?tipoConsulta=completa&tipoConteudo=XbSeqxE8pl8=";
+        $url = "https://www.nfe.fazenda.gov.br/portal/consulta.aspx?tipoConsulta=completa&tipoConteudo=XbSeqxE8pl8%3d";
         // Arquivo de coockie para armazenar a session
         $cookie = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'cookies1.txt';
         // Simula um browser pelo curl
         $useragent = 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.99 Safari/535.1';
 
         /* Start Login process */
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie);
         curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie);
-        curl_setopt($ch, CURLOPT_HEADER, TRUE);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, FALSE);
-        curl_setopt($ch, CURLOPT_REFERER, $url);
-        curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
-        //curl_setopt($ch, CURLOPT_STDERR, $f);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
+        //$verbose = fopen('log.txt', 'w+');
+        //curl_setopt($ch, CURLOPT_STDERR, $verbose);
+        //curl_setopt($ch, CURLOPT_VERBOSE, true);
 
         // Collecting all POST fields
         $postfields = array();
@@ -106,69 +102,38 @@ class DownloadNFeSefaz {
         $postfields['ctl00$ContentPlaceHolder1$txtCaptcha'] = $txtCaptcha;
         $postfields['ctl00$ContentPlaceHolder1$btnConsultar'] = 'Continuar';
         $postfields['ctl00$ContentPlaceHolder1$token'] = $_SESSION['token'];
+        $postfields['ctl00$ContentPlaceHolder1$captchaSom'] = $_SESSION['captchaSom'];
         $postfields['hiddenInputToUpdateATBuffer_CommonToolkitScripts'] = '1';
 
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
-        $html = curl_exec($ch); // Get result after login page.
 
-        curl_close($ch);
+        // Result
+        $html = curl_exec($ch);
 
-        //echo $html;
-
-        /* ENTRA NA INFO DA NFE */
-        $ch = curl_init();
-
-        $url_det_nfe = 'http://www.nfe.fazenda.gov.br/portal/consultaCompleta.aspx?tipoConteudo=XbSeqxE8pl8=';
-
-        curl_setopt($ch, CURLOPT_URL, $url_det_nfe);
-        //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie);
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie);
-        curl_setopt($ch, CURLOPT_HEADER, FALSE);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, FALSE);
-        curl_setopt($ch, CURLOPT_REFERER, $url);
-        curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 400);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 400); //timeout in seconds
-        curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
-
-        $tagTeste = "";
-
-        $html = curl_exec($ch); // Get result after login page.
-        
-        $document = new DOMDocument();
-        $document->loadHTML($html);
-        
         preg_match('~Dados da NF-e~', $html, $tagTeste);
-        //exit($html);
-        $viewstate = $document->getElementById('__VIEWSTATE')->getAttribute('value');
-        $stategen = $document->getElementById('__VIEWSTATEGENERATOR')->getAttribute('value');
-        $eventValidation = $document->getElementById('__EVENTVALIDATION')->getAttribute('value');
-        
-        //preg_match('~<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="(.*?)" />~', $html, $viewstate);
-        //preg_match('~<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="(.*?)" />~', $html, $stategen);
-        //preg_match('~<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="(.*?)" />~', $html, $eventValidation);
-
-        //$stategen = $stategen[1];
-        //$viewstate = $viewstate[1];
-        //$eventValidation = $eventValidation[1];
 
         if (isset($tagTeste[0])) {
             $tagDownload = $tagTeste[0];
         } else {
-            //exit($html);
-            throw new Exception('Não foi possível fazer o download do XML, por favor atualize o captcha e tente novamente (sessão expirada)');
+            throw new Exception('Sessão expirada ou captcha inválido, gere um novo captcha e tente novamente.');
         }
 
+        $document = new DOMDocument();
+        $document->loadHTML($html);
+
+        $viewstate = $document->getElementById('__VIEWSTATE')->getAttribute('value');
+        $stategen = $document->getElementById('__VIEWSTATEGENERATOR')->getAttribute('value');
+        $eventValidation = $document->getElementById('__EVENTVALIDATION')->getAttribute('value');
+
         curl_close($ch);
-        
+        //fclose($verbose);
+
         // Parãmetro teste para saber se a página veio corretamente
         if ($tagDownload == "Dados da NF-e") {
 
             // URL onde a sefaz fornece o download do xml
-            $url_download = "http://www.nfe.fazenda.gov.br/portal/consultaCompleta.aspx?tipoConteudo=XbSeqxE8pl8=";
+            $url_download = "https://www.nfe.fazenda.gov.br/portal/consultaCompleta.aspx?tipoConteudo=XbSeqxE8pl8=";
 
             // Verifica se o certificado existe na pasta
             if (!file_exists($this->pathCertsFiles . $this->CNPJ . '_priKEY.pem') ||
@@ -177,17 +142,20 @@ class DownloadNFeSefaz {
                 throw new Exception('Certificado digital não encontrado na pasta: ' . $this->pathCertsFiles . '!');
             }
 
-            /**
-              Download xml
-             */
-            $ch_download = curl_init();
+            /** Download do xml * */
+            $ch_download = curl_init($url_download);
 
-            curl_setopt($ch_download, CURLOPT_URL, $url_download);
-            curl_setopt($ch_download, CURLOPT_SSL_VERIFYPEER, FALSE);
-            curl_setopt($ch_download, CURLOPT_RETURNTRANSFER, TRUE);
             curl_setopt($ch_download, CURLOPT_COOKIEJAR, $cookie);
             curl_setopt($ch_download, CURLOPT_COOKIEFILE, $cookie);
-            curl_setopt($ch_download, CURLOPT_HEADER, TRUE);
+            curl_setopt($ch_download, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch_download, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch_download, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch_download, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch_download, CURLOPT_USERAGENT, $useragent);
+            //$verbose = fopen('log.txt', 'w+');
+            //curl_setopt($ch_download, CURLOPT_STDERR, $verbose);
+            //curl_setopt($ch_download, CURLOPT_VERBOSE, true);
+
             // this with CURLOPT_SSLKEYPASSWD 
             curl_setopt($ch_download, CURLOPT_SSLKEY, $this->pathCertsFiles . $this->CNPJ . '_priKEY.pem');
             // The --cacert option
@@ -196,15 +164,6 @@ class DownloadNFeSefaz {
             curl_setopt($ch_download, CURLOPT_SSLCERT, $this->pathCertsFiles . $this->CNPJ . '_pubKEY.pem');
             // Cert pass
             curl_setopt($ch_download, CURLOPT_SSLCERTPASSWD, $this->certPass);
-            curl_setopt($ch_download, CURLOPT_FOLLOWLOCATION, FALSE);
-            curl_setopt($ch_download, CURLOPT_REFERER, $url_download);
-            //curl_setopt($ch_download, CURLOPT_VERBOSE, 1);
-
-            curl_setopt($ch_download, CURLOPT_CONNECTTIMEOUT, 400);
-            curl_setopt($ch_download, CURLOPT_TIMEOUT, 400); //timeout in seconds
-            // Log
-            //curl_setopt($ch_download, CURLOPT_STDERR, fopen("dump", "wb"));
-            curl_setopt($ch_download, CURLOPT_USERAGENT, $useragent);
 
             // Collecting all POST fields
             $postfields_download = array();
@@ -221,69 +180,24 @@ class DownloadNFeSefaz {
             curl_setopt($ch_download, CURLOPT_POST, 1);
             curl_setopt($ch_download, CURLOPT_POSTFIELDS, $postfields_download);
 
-            $response = curl_exec($ch_download); // Get result after login page.
+            $response_xml = curl_exec($ch_download);
 
-            $download_link_arr = array();
+            // Verifica xml
+            $doc = simplexml_load_string($response_xml);
 
-            //echo($response);
-            //dd($download_link);
-
-            $header_size = curl_getinfo($ch_download, CURLINFO_HEADER_SIZE);
-            $header = substr($response, 0, $header_size);
-            //$body = substr($response, $header_size);
-            // Pega o link para download na header
-            preg_match_all('/Location: (.*?)\n/sm', $header, $download_link_arr);
-            //exit($response);
-            //exit($header);
-            $download_link_ = $download_link_arr[1];
-
-            // VALIDA
-            if (isset($download_link_[0])) {
-                $download_link = $download_link_[0];
+            if ($doc) {
+                curl_close($ch_download);
+                //fclose($verbose);
+                return $response_xml;
             } else {
-                // Tenta até conseguir
-                $this->downloadXmlSefaz($txtCaptcha, $chNFe, $CNPJ, $pathCertsFiles, $certPass);
-                //throw new Exception("Não foi possível gerar o download, por favor tente novamente!");
+                $document = new DOMDocument();
+                $document->loadHTML($response_xml);
+                $result = $document->getElementById('ctl00_ContentPlaceHolder1_lblResultadoConsulta')->nodeValue;
+                throw new Exception($result);
             }
 
-            curl_close($ch_download);
-
-            /** DOWNLOAD XML 2 * */
-            /**
-              Download xml
-             */
-            $ch_download = curl_init();
-            //exit($download_link);
-            curl_setopt($ch_download, CURLOPT_URL, str_replace(array("\n", "0d", "\r"), "", $download_link));
-            curl_setopt($ch_download, CURLOPT_SSL_VERIFYHOST, 0);
-            curl_setopt($ch_download, CURLOPT_SSL_VERIFYPEER, 0);
-            curl_setopt($ch_download, CURLOPT_RETURNTRANSFER, TRUE);
-            curl_setopt($ch_download, CURLOPT_FOLLOWLOCATION, TRUE);
-            curl_setopt($ch_download, CURLOPT_COOKIEJAR , $cookie);
-            curl_setopt($ch_download, CURLOPT_COOKIEFILE, $cookie);
-
-            // this with CURLOPT_SSLKEYPASSWD 
-            curl_setopt($ch_download, CURLOPT_SSLKEY, $this->pathCertsFiles . $this->CNPJ . '_priKEY.pem');
-            // The --cacert option
-            curl_setopt($ch_download, CURLOPT_CAINFO, $this->pathCertsFiles . $this->CNPJ . '_certKEY.pem');
-            // The --cert option
-            curl_setopt($ch_download, CURLOPT_SSLCERT, $this->pathCertsFiles . $this->CNPJ . '_pubKEY.pem');
-            // Cert pass
-            curl_setopt($ch_download, CURLOPT_SSLCERTPASSWD, $this->certPass);
-            
-            $verbose = fopen('log.txt', 'w+');
-            curl_setopt($ch_download, CURLOPT_STDERR, $verbose);
-            curl_setopt($ch_download, CURLOPT_VERBOSE, TRUE);
-
-            $response_xml = curl_exec($ch_download); // Get result after login page.
-            //exit($download_link);
-            curl_close($ch_download);
-            fclose($verbose);
-
-            return $response_xml;
-            
         } else {
-            throw new Exception('Não foi possível fazer o download do XML, por favor tente novamente (Verifique o Captcha)');
+            throw new Exception('Não foi possível fazer o download do XML, verifique o debug');
         }
     }
 
@@ -293,58 +207,53 @@ class DownloadNFeSefaz {
      * @return String base64 png
      */
     public function getDownloadXmlCaptcha() {
-        /*Verificando se a session já não foi aberta*/
-        if (session_status() == PHP_SESSION_NONE) session_start();
+
+        /* Verificando se a session já não foi aberta */
+        if (session_status() == PHP_SESSION_NONE)
+            session_start();
 
         // Passo 1
-        $url = "http://www.nfe.fazenda.gov.br/portal/consulta.aspx?tipoConsulta=completa&tipoConteudo=XbSeqxE8pl8=";
+        $url = "https://www.nfe.fazenda.gov.br/portal/consulta.aspx?tipoConsulta=completa&tipoConteudo=XbSeqxE8pl8=";
         $cookie = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'cookies1.txt';
         $useragent = 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.2 (KHTML, like Gecko) Chrome/5.0.342.3 Safari/533.2';
 
-        /* Get __VIEWSTATE & __EVENTVALIDATION */
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie);
         curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
+        //$verbose = fopen('log.txt', 'w+');
+        //curl_setopt($ch, CURLOPT_STDERR, $verbose);
+        //curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
 
         $html = curl_exec($ch);
 
         $document = new DOMDocument();
         $document->loadHTML($html);
-        
-        $stategen = $document->getElementById('__VIEWSTATEGENERATOR')->getAttribute('value');
-        $token = $document->getElementById('ctl00_ContentPlaceHolder1_token')->getAttribute('value');
+
         $viewstate = $document->getElementById('__VIEWSTATE')->getAttribute('value');
+        $stategen = $document->getElementById('__VIEWSTATEGENERATOR')->getAttribute('value');
         $eventValidation = $document->getElementById('__EVENTVALIDATION')->getAttribute('value');
-        
-        //preg_match('~<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="(.*?)" />~', $html, $_viewstate);
-        //preg_match('~<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="(.*?)" />~', $html, $_stategen);
-        //preg_match('~<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="(.*?)" />~', $html, $_eventValidation);
-        //preg_match('~<input type="hidden" name="ctl00\$ContentPlaceHolder1\$token" id="ctl00_ContentPlaceHolder1_token" value="(.*?)" />~', $html, $_sstoken);
+        $token = $document->getElementById('ctl00_ContentPlaceHolder1_token')->getAttribute('value');
+        $captchaSom = $document->getElementById('ctl00_ContentPlaceHolder1_captchaSom')->getAttribute('value');
+
         preg_match('~<img id=\"ctl00_ContentPlaceHolder1_imgCaptcha\" src=\"(.*)\" ~', $html, $_captcha);
 
-        // TODO: Verificar se a página do captcha foi carregada
-
-        //$stategen = $_stategen[1];
-        $_SESSION['stategen'] = $stategen;
-
-        //$token = $_sstoken[1];
-        $_SESSION['token'] = $token;
-
-        //$viewstate = $_viewstate[1];
         $_SESSION['viewstate'] = $viewstate;
-
-        //$eventValidation = $_eventValidation[1];
+        $_SESSION['stategen'] = $stategen;
         $_SESSION['eventValidation'] = $eventValidation;
+        $_SESSION['token'] = $token;
+        $_SESSION['captchaSom'] = $captchaSom;
 
         $captcha = $_captcha[1];
 
         curl_close($ch);
-        
+        //fclose($verbose);
+
         return $captcha;
-        
     }
 
 }

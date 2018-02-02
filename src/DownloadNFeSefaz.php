@@ -213,7 +213,7 @@ class DownloadNFeSefaz {
             session_start();
 
         // Passo 1
-        $url = "https://www.nfe.fazenda.gov.br/portal/consulta.aspx?tipoConsulta=completa&tipoConteudo=XbSeqxE8pl8=";
+        $url = "https://www.nfe.fazenda.gov.br/portal/consultaResumoCompletaAntiga.aspx?tipoConteudo=XbSeqxE8pl8=&tipoConsulta=completa";
         $cookie = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'cookies1.txt';
         $useragent = 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.2 (KHTML, like Gecko) Chrome/5.0.342.3 Safari/533.2';
 

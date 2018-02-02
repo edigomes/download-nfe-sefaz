@@ -69,7 +69,7 @@ class DownloadNFeSefaz {
             session_start();
 
         // URL onde a sefaz fornece o botão de download
-        $url = "https://www.nfe.fazenda.gov.br/portal/consulta.aspx?tipoConsulta=completa&tipoConteudo=XbSeqxE8pl8%3d";
+        $url = "https://www.nfe.fazenda.gov.br/portal/consultaResumoCompletaAntiga.aspx?tipoConteudo=XbSeqxE8pl8=&tipoConsulta=completa";
         // Arquivo de coockie para armazenar a session
         $cookie = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'cookies1.txt';
         // Simula um browser pelo curl
